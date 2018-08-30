@@ -18,5 +18,17 @@ object JsonSerializer {
       def toJson(a: List[A]): String =
         (a map (v => JsonSerializer.toJson(v))).mkString("[", ", ", "]")
     }
+
+  implicit val stringSerializer =
+    new JsonSerializer[String] {
+      def toJson(a: String): String = "\"" + a + "\""
+    }
+
+  implicit def mapSerializer[A: JsonSerializer]: JsonSerializer[Map[String,A]] =
+    new JsonSerializer[Map[String,A]] {
+      def toJson(a: Map[String,A]): String = a.map {
+        case (k, v) => "\"" + k + "\"" + ":" + JsonSerializer.toJson(v)
+      }.mkString("{", ",", "}")
+    }
 }
 
